@@ -52,7 +52,7 @@ def merge_helper(a,b):
 		else:
 			if a[ia]<b[ib]:
 				res.append(a[ia])
-				ia+=
+				ia+=1
 			else:
 				res.append(b[ib])
 				ib+=1

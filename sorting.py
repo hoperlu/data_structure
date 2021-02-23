@@ -5,7 +5,10 @@ def printer(func):
 	def helper(*args):
 		time_start=time()
 		res=func(*args)
-		print(func.__name__,res==ans,time()-time_start)
+		if res==ans:
+			print(func.__name__,time()-time_start)
+		else:
+			print(func.__name__,time()-time_start,'wrong answer!!!!!')
 	return helper
 
 @printer
@@ -64,21 +67,98 @@ def	merge_sort(res):
 	m=len(res)//2
 	return merge_helper(merge_sort(res[:m]),merge_sort(res[m:]))
 
-@printer
 def	quick_sort(q):
 	if len(q)==2:
 		res=q.copy()
 		if res[0]>res[1]:
 			res[0],res[1]=res[1],res[0]
 		return res
-	#if 2<len(q)<12:
-
-	#res=[0 for index in range(len(q))]
-
+	if 2<len(q)<12:
+		l=3
+		temp=q[:l]
+		for index in range(l-1):
+			m=temp[index] #current min
+			mindex=index #index of current min
+			for index2 in range(index+1,l):
+				if temp[index2]<m:
+					m=temp[index2]
+					mindex=index2
+			if mindex!=index:
+				temp[index],temp[mindex]=temp[mindex],temp[index]
+		p=temp[1]
+		s=[] #smaller part
+		b=[] #bigger part
+		count=0 #==p
+		for index in range(len(q)):
+			if q[index]<p:
+				s.append(q[index])
+			elif q[index]>p:
+				b.append(q[index])
+			else:
+				count+=1
+	else:
+		l=11
+		temp=q[:l]
+		for index in range(l-1):
+			m=temp[index] #current min
+			mindex=index #index of current min
+			for index2 in range(index+1,l):
+				if temp[index2]<m:
+					m=temp[index2]
+					mindex=index2
+			if mindex!=index:
+				temp[index],temp[mindex]=temp[mindex],temp[index]
+		p=temp[5]
+		s=[] #smaller part
+		b=[] #bigger part
+		count=0 #==p
+		for index in range(len(q)):
+			if q[index]<p:
+				s.append(q[index])
+			elif q[index]>p:
+				b.append(q[index])
+			else:
+				count+=1
+	res=[0 for index in range(len(q))]
+	for index in range(len(s),len(s)+count):
+		res[index]=p
+	if len(s)>1:
+		res[:len(s)]=quick_sort(s)
+	elif len(s)==1:
+		res[0]=s[0]
+	if len(b)>1:
+		res[len(q)-len(b):]=quick_sort(b)
+	elif len(b)==1:
+		res[-1]=b[0]
 	return res
 
 @printer
-def	heap_sort():
+def	heap_sort(q):
+	res=[]
+	for index in range(len(q)):
+		res.append(q[index])
+		if len(res)>1:
+			index2=index
+			index3=(index2-1)//2
+			while index2>0 and res[index2]>res[index3]:
+				res[index3],res[index2]=res[index2],res[index3]
+				index2=index3
+				index3=(index2-1)//2
+	count=len(res)-1
+	while count>0:
+		res[0],res[count]=res[count],res[0]
+		index=0
+		while index*2+2<count and res[index]<max(res[index*2+1],res[index*2+2]):
+			if res[index*2+1]>res[index*2+2]:
+				res[index],res[index*2+1]=res[index*2+1],res[index]
+				index=index*2+1
+			else:
+				res[index*2+2],res[index]=res[index],res[index*2+2]
+				index=index*2+2
+		count-=1
+		if index*2+1==count:
+			if res[index*2+1]>res[index]:
+				res[index*2+1],res[index]=res[index],res[index*2+1]
 	return res
 
 q=[randrange(-100000,100000) for index in range(10000)] #len(q)>1
@@ -90,8 +170,6 @@ print('ans',ans[:10],time()-time_start)
 insertion_sort(q.copy())
 selection_sort(q.copy())
 bubble_sort(q.copy())
-time_start=time()
-res=merge_sort(q.copy())
-print('merge_sort',res==ans,time()-time_start)
-#quick_sort(q.copy())
-#heap_sort(q.copy())
+printer(merge_sort)(q.copy())
+printer(quick_sort)(q.copy())
+heap_sort(q.copy())

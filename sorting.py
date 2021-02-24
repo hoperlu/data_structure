@@ -161,7 +161,90 @@ def	heap_sort(q):
 				res[index*2+1],res[index]=res[index],res[index*2+1]
 	return res
 
+def radix_exchange_helper(q,count):
+	if count==-1:
+		return q
+	buckets=[[] for index in range(20)] #[[-9],[-8],...,[-1],[-0],[0],[1],...,[8],[9]]
+	for term in q:
+		if term<0:
+			temp=(-1*term)%10**(count+1)
+		else:
+			temp=term%10**(count+1)
+		if term<0:
+			buckets[9-temp//(10**count)].append(term)
+		else:
+			buckets[temp//(10**count)+10].append(term)
+	res=[]
+	count-=1
+	for bucket in buckets:
+		res.extend(radix_exchange_helper(bucket,count))
+	return res
+
+@printer
+def radix_exchange_sort(q):
+	#bucket sort hashing from most significant bit
+	max_=q[0]
+	min_=q[0]
+	for term in q:
+		if term>max_:
+			max_=term
+		if term<min_:
+			min_=term
+	max_=str(max_)
+	min_=str(min_)
+	if max_[0]=='-':
+		max_=max_[1:]
+	if min_[0]=='-':
+		min_=min_[1:]
+	count=max(len(min_),len(max_))-1
+	buckets=[[] for index in range(20)] #[[-9],[-8],...,[-1],[-0],[0],[1],...,[8],[9]]
+	for term in q:
+		if term<0:
+			buckets[9-(-1*term)//(10**count)].append(term)
+		else:
+			buckets[term//(10**count)+10].append(term)
+	res=[]
+	count-=1
+	for bucket in buckets:
+		res.extend(radix_exchange_helper(bucket,count))
+	return res
+
+@printer
+def straight_radix_sort(q):
+	#bucket sort hashing from least significant bit
+	res=q.copy()
+	max_=res[0]
+	min_=res[0]
+	for index in range(len(res)):
+		if res[index]>max_:
+			max_=res[index]
+		if res[index]<min_:
+			min_=res[index]
+	max_=str(max_)
+	min_=str(min_)
+	if max_[0]=='-':
+		max_=max_[1:]
+	if min_[0]=='-':
+		min_=min_[1:]
+	count_max=max(len(min_),len(max_))-1
+	count=0
+	temp=[]
+	while count<=count_max:
+		buckets=[[] for index in range(20)] #[[-9],[-8],...,[-1],[-0],[0],[1],...,[8],[9]]
+		for term in res:
+			if term<0:
+				buckets[9-(-1*term)//(10**count)%10].append(term)
+			else:
+				buckets[term//(10**count)%10+10].append(term)
+		count+=1
+		for bucket in buckets:
+			temp.extend(bucket)
+		res=temp.copy()
+		temp=[]
+	return res
+
 q=[randrange(-100000,100000) for index in range(10000)] #len(q)>1
+#q=[0,-1,-5,-7,0,1,5,7,0,1,5,7,0,1,-5,-7,0,-1,-5,-7,0,-1,-5,7,0,1,5,7,0,1] #len(q)>1
 print(q[:10])
 time_start=time()
 ans=sorted(q)
@@ -173,3 +256,5 @@ bubble_sort(q.copy())
 printer(merge_sort)(q.copy())
 printer(quick_sort)(q.copy())
 heap_sort(q.copy())
+radix_exchange_sort(q.copy())
+straight_radix_sort(q.copy())
